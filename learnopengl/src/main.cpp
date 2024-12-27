@@ -10,7 +10,7 @@
 #include "shader_s.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <stb_image.h>
 
 struct ShaderProgramSource
 {
@@ -101,7 +101,7 @@ int main(){
     // 将窗口的上下文设置为当前线程的上下文
     glfwMakeContextCurrent(window);
     // 设置帧缓冲区大小回调函数
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow*, int, int)->void { GLCall(glViewport(0,0,800,600));});
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow*, int, int)->void { glViewport(0,0,800,600);});
 
     // 初始化GLAD库，如果失败，输出错误信息并退出程序
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -115,10 +115,10 @@ int main(){
     // 定义顶点数据
     float vertices[] = {
     //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f,   // 右上
+        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,   // 右下
         -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f    // 左上
     };
 
     // 定义索引数据
@@ -131,44 +131,44 @@ int main(){
 
     // 生成VAO、VBO和EBO对象
     unsigned int VAO,VBO,EBO;
-    GLCall(glGenVertexArrays(1, &VAO));
-    GLCall(glGenBuffers(1, &VBO));
-    GLCall(glGenBuffers(1, &EBO));
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
     // 绑定VAO对象
-    GLCall(glBindVertexArray(VAO));
+    glBindVertexArray(VAO);
 
     // 绑定VBO对象，并将顶点数据复制到缓冲区中
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-    GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // 绑定EBO对象，并将索引数据复制到缓冲区中
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
-    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW));
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // 配置顶点属性指针
-    GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0));
-    GLCall(glEnableVertexAttribArray(0));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
     
-    GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 *sizeof(float))));
-    GLCall(glEnableVertexAttribArray(1));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 *sizeof(float)));
+    glEnableVertexAttribArray(1);
     
-    GLCall(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 *sizeof(float))));//这个6是为什么呢//偏移量，从第六个开始
-    GLCall(glEnableVertexAttribArray(2));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 *sizeof(float)));//这个6是为什么呢//偏移量，从第六个开始
+    glEnableVertexAttribArray(2);
     
     // 生成纹理对象
     unsigned int texture1, texture2;//纹理id
-    GLCall(glGenTextures(1, &texture1));//纹理对象id
+    glGenTextures(1, &texture1);//纹理对象id
 
     // 绑定纹理对象到纹理单元0
-    GLCall(glActiveTexture(GL_TEXTURE0));
-    GLCall(glBindTexture(GL_TEXTURE_2D, texture1));//绑定id和纹理对象
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);//绑定id和纹理对象
 
     // 设置纹理参数
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));//设置样式环绕(wrap)方式,repeat是重复
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));//设置纹理过滤(filter),(liner)线性过滤糊但是色去平均,nearset即临近过滤是什么就取什么,有像素感;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//设置样式环绕(wrap)方式,repeat是重复
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//设置纹理过滤(filter),(liner)线性过滤糊但是色去平均,nearset即临近过滤是什么就取什么,有像素感;
 
     // 加载纹理图像
     int width, height, nrChannels;
@@ -177,8 +177,8 @@ int main(){
     unsigned char* data =stbi_load(std::filesystem::path("../asset/container.jpg").string().c_str(), &width, &height, &nrChannels, 0);
     if(data)
     {
-        GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,GL_RGB, GL_UNSIGNED_BYTE, data));
-        GLCall(glGenerateMipmap(GL_TEXTURE_2D));//生成纹理
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);//生成纹理
     }
     else 
     {
@@ -189,23 +189,25 @@ int main(){
     stbi_image_free(data);
 
     // 生成第二个纹理对象
-    GLCall(glGenTextures(1, &texture2));//纹理对象id
+    glGenTextures(1, &texture2);//纹理对象id
 
-    // 绑定纹理对象到纹理单元1
-    GLCall(glBindTexture(GL_TEXTURE_2D, texture2));//绑定id和纹理对象
+    // 绑定纹理对象到纹理单元2
+    glBindTexture(GL_TEXTURE_2D, texture2);//绑定id和纹理对象
 
     // 设置纹理参数
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));//设置样式环绕(wrap)方式,repeat是重复
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));//设置纹理过滤(filter),(liner)线性过滤糊但是色去平均,nearset即临近过滤是什么就取什么,有像素感;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//设置样式环绕(wrap)方式,repeat是重复
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//设置纹理过滤(filter),(liner)线性过滤糊但是色去平均,nearset即临近过滤是什么就取什么,有像素感;
+
+    stbi_set_flip_vertically_on_load(true);
 
     // 加载第二个纹理图像
     data = stbi_load(std::filesystem::path("../asset/awesomeface.png").string().c_str(), &width, &height, &nrChannels, 0);
     if(data)
     {
-        GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,GL_RGBA, GL_UNSIGNED_BYTE, data));
-        GLCall(glGenerateMipmap(GL_TEXTURE_2D));//生成纹理
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);//生成纹理
     }
     else 
     {
@@ -217,7 +219,7 @@ int main(){
 
     // 使用Shader对象
     ourShader.use();
-    GLCall(glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0));
+    glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
     ourShader.setInt("texture2", 1);
 
     // 主循环
@@ -227,21 +229,21 @@ int main(){
         processInput(window);
 
         // 清除颜色缓冲区
-        GLCall(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
-        GLCall(glClear(GL_COLOR_BUFFER_BIT));
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         // 绑定纹理对象
-        GLCall(glActiveTexture(GL_TEXTURE0));
-        GLCall(glBindTexture(GL_TEXTURE_2D, texture1));
-        GLCall(glActiveTexture(GL_TEXTURE1));
-        GLCall(glBindTexture(GL_TEXTURE_2D, texture2));
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
 
         // 使用Shader对象
         ourShader.use();
 
         // 绑定VAO对象并绘制三角形
-        GLCall(glBindVertexArray(VAO));
-        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // 交换缓冲区并处理事件
         glfwSwapBuffers(window);
@@ -249,10 +251,10 @@ int main(){
     }
 
     // 删除VAO、VBO和EBO对象
-    GLCall(glDeleteVertexArrays(1, &VAO));
-    GLCall(glDeleteBuffers(1, &VBO));
-    GLCall(glDeleteBuffers(1, &EBO));
-    // GLCall(glDeleteProgram(ourShader.ID));
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    // glDeleteProgram(ourShader.ID);
 
     // 终止GLFW库
     glfwTerminate();
